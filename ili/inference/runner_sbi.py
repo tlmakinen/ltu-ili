@@ -146,8 +146,6 @@ class SBIRunner:
             model = model.append_simulations(theta, x)
             if not isinstance(self.embedding_net, nn.Identity):
                 self.embedding_net.initalize_model(n_input=x.shape[-1])
-            print('Inference class = ', str(self.inference_class))
-            print('Should be VI = ', 'vi' if 'snle' in str(self.inference_class) else None)
             de = model.train(
                 **self.train_args,
             )
@@ -161,12 +159,10 @@ class SBIRunner:
                    vi_method="fKL" if 'snle' in str(self.inference_class) else None,
             ))
             val_loss += model.summary["best_validation_log_prob"]
-        print('posteriors = ', posteriors)
         posterior = NeuralPosteriorEnsemble(
             posteriors=posteriors,
             weights=torch.tensor([float(vl) for vl in val_loss]),
         )
-        print('posterior = ', posterior)
         with open(self.output_path / "posterior.pkl", "wb") as handle:
             pickle.dump(posterior, handle)
         logging.info(f"It took {time.time() - t0} seconds to train all models.")
