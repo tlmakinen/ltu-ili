@@ -1,6 +1,6 @@
 import yaml
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Dict
 from pathlib import Path
 import numpy as np
 import json
@@ -88,6 +88,9 @@ class SummarizerDatasetLoader(BaseLoader):
         param_file: str,
         train_test_split_file: str,
         param_names: List[str],
+        islice_filters: Dict=None,
+        slice_filters: Dict=None,
+        select_filters: Dict=None,
     ):
         """Class to load netCF files of summaries and a csv of parameters
         Basically a wrapper for ili-summarizer's Dataset, with added parameter loading
@@ -100,6 +103,9 @@ class SummarizerDatasetLoader(BaseLoader):
             param_file (str): parameter file name
             train_test_split_file (str): file name where train, test, val split idx are stored
             param_names (List[str]): parameters to fit
+            islice_filters (Dict): dictionary of filters to slice on the summaries' coordinates indices
+            slice_filters (Dict): dictionary of filters to slice on the summaries' coordinates
+            select_filters (Dict): dictionary of filters to select on the summaries' coordinates
 
         Raises:
             Exception: won't work when summaries and parameters don't have same length
@@ -112,6 +118,9 @@ class SummarizerDatasetLoader(BaseLoader):
             nodes=self.nodes,
             path_to_data=self.data_dir,
             root_file=summary_root_file,
+            islice_filters=islice_filters,
+            slice_filters=slice_filters,
+            select_filters=select_filters,
         )
         self.theta = self.load_parameters(
             param_file=param_file,
@@ -120,7 +129,7 @@ class SummarizerDatasetLoader(BaseLoader):
         )
         if len(self.data) != len(self.theta):
             raise Exception("Stored summaries and parameters are not of same length.")
-
+    
     def __len__(self) -> int:
         """Returns the total number of data points in the dataset
 

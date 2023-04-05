@@ -20,11 +20,14 @@ if __name__ == '__main__':
 
     train_loader = SummarizerDatasetLoader.from_config(args.cfgdata, stage='train')
     val_loader = SummarizerDatasetLoader.from_config(args.cfgdata, stage='val')
+    print('Loaded train and val')
 
     # train a model to infer x -> theta. save it as toy/posterior.pkl
+    print('Running')
     runner = SBIRunner.from_config(args.cfginfer)
     runner(loader=train_loader)
 
     # use the trained posterior model to predict on a single example from the test set
+    print('Running val')
     val_runner = ValidationRunner.from_config(args.cfgval)
     val_runner(loader=val_loader)
