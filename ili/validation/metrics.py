@@ -124,12 +124,14 @@ class PlotSinglePosterior(_SampleBasedMetric):
         samples = sampler.sample(self.num_samples, x=x_obs, progress=True)
 
         # plot
-        g = sns.pairplot(
-            pd.DataFrame(samples, columns=self.labels),
-            kind=None,
-            diag_kind="kde",
-            corner=True,
-        )
+        with warnings.catch_warnings():  # catching mpl-caused warning
+            warnings.filterwarnings("ignore")
+            g = sns.pairplot(
+                pd.DataFrame(samples, columns=self.labels),
+                kind=None,
+                diag_kind="kde",
+                corner=True,
+            )
         g.map_lower(sns.kdeplot, levels=4, color=".2")
 
         for i in range(ndim):
@@ -225,6 +227,8 @@ class PlotRankStatistics(_SampleBasedMetric):
             axis.axhline(ncounts - ncounts ** 0.5, color='k', ls="--")
             axis.axhline(ncounts + ncounts ** 0.5, color='k', ls="--")
 
+        if self.output_path is None:
+            return fig
         plt.savefig(self.output_path / 'rankplot.jpg',
                     dpi=300, bbox_inches='tight')
 
@@ -254,6 +258,8 @@ class PlotRankStatistics(_SampleBasedMetric):
         for axis in ax:
             axis.grid(visible=True)
 
+        if self.output_path is None:
+            return fig
         plt.savefig(self.output_path / 'coverage.jpg',
                     dpi=300, bbox_inches='tight')
 
@@ -277,6 +283,8 @@ class PlotRankStatistics(_SampleBasedMetric):
             axs[j].set_xlabel('True')
             axs[j].set_ylabel('Predicted')
 
+        if self.output_path is None:
+            return fig
         plt.savefig(self.output_path / 'predictions.jpg',
                     dpi=300, bbox_inches='tight')
 
@@ -368,5 +376,8 @@ class TARP(_SampleBasedMetric):
         ax.legend()
         ax.set_ylabel("Expected Coverage")
         ax.set_xlabel("Credibility Level")
+
+        if self.output_path is None:
+            return fig
         plt.savefig(self.output_path / "plot_tarp.jpg",
                     dpi=300, bbox_inches='tight')
