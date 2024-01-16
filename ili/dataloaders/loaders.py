@@ -10,6 +10,7 @@ import numpy as np
 import json
 import pandas as pd
 from ili.utils import Dataset
+import torch
 
 try:
     from sbi.simulators.simutils import simulate_in_batches
@@ -291,6 +292,10 @@ class SBISimulator(NumpyLoader):
         """
         theta = proposal.sample((self.num_simulations,)).cpu()
         x = simulate_in_batches(self.simulator, theta)
+        
+        # Get device returns -1 for cpu, integers for CUDA tensors
+        if x.get_device() != -1:
+            x = x.cpu()
         theta, x = theta.numpy(), x.numpy()
         print(self.x.shape, x.shape)
 
